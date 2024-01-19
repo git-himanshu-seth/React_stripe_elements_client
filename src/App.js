@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-
+import config from "./config";
 import CheckoutForm from "./components/CheckoutForm";
 import "./App.css";
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
 // This is your test publishable API key.
-const stripePromise = loadStripe(
-  "pk_test_51MG48VKzHDcdWkRY3XPnvbTMvZhiSFfMjUKYuWei6pugj9PuybsL3pe878WevJxkjjuZX5WVw6evMZzIWc2EClLO00yVFpI3nx"
-);
+console.log(process);
+const stripePromise = loadStripe(config.STRIPE_PUBLISH_KEY);
 
 function App() {
   const [clientSecret, setClientSecret] = useState("");
