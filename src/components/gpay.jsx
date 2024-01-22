@@ -1,39 +1,61 @@
-import React from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
+import React, { useEffect, useState } from "react";
+import {
+  useStripe,
+  PaymentRequestButtonElement,
+} from "@stripe/react-stripe-js";
 
 // Import your custom StripeElement components (if needed)
 // import MyCardElement from './MyCardElement';
 
-const stripePromise = loadStripe("your_stripe_publishable_key");
-
 const GooglePayButton = () => {
-  const handleClick = async () => {
-    // Create a Stripe.js instance with your publishable key
-    const stripe = await stripePromise;
+  const stripe = useStripe();
+  const [paymentRequest, setPaymentRequest] = useState();
+  useEffect(() => {
+    (async () => {
+      if (stripe) {
+        const pr = stripe.paymentRequest({
+          country: "US",
+          currency: "usd",
+          total: {
+            label: "Demo total",
+            amount: 1099,
+          },
+          requestPayerName: true,
+          requestPayerEmail: true,
+        });
 
-    // Create a PaymentMethod with the Google Pay payment method type
-    const { paymentMethod } = await stripe.createPaymentMethod({
-      type: "card",
-      card: {
-        token: "your_google_pay_token", // Replace with the Google Pay token
-      },
-    });
-
-    // Handle the payment method ID as needed (e.g., send it to your server)
-    console.log("PaymentMethod", paymentMethod);
-  };
-
-  return <button onClick={handleClick}>Pay with Google Pay</button>;
+        // Check the availability of the Payment Request API.
+        console.log("PR", pr);
+        pr.canMakePayment().then((result) => {
+          console.log("result", result);
+          if (result) {
+            setPaymentRequest(pr);
+          } else {
+            console.log("error: Failed to make payment", result);
+          }
+        });
+      }
+    })();
+  }, [stripe]);
+  console.log(paymentRequest);
+  return (
+    <>
+      {/* <PaymentElement id="payment" options={paymentElementOptions} /> */}
+      <button id="paymentRequestButton" onClick={() => {}}>
+        Pay with Google Pay
+      </button>
+      {paymentRequest && (
+        <div>
+          <h1>GPY</h1>
+          <PaymentRequestButtonElement options={{ paymentRequest }} />
+        </div>
+      )}
+    </>
+  );
 };
 
 const App = () => {
-  return (
-    <Elements stripe={stripePromise}>
-      {/* You can wrap your GooglePayButton component with other Elements if needed */}
-      <GooglePayButton />
-    </Elements>
-  );
+  return <>{GooglePayButton()}</>;
 };
 
 export default App;

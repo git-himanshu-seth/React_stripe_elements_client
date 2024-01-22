@@ -8,7 +8,7 @@ import "./App.css";
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
 // This is your test publishable API key.
-console.log(process);
+console.log(config);
 const stripePromise = loadStripe(config.STRIPE_PUBLISH_KEY);
 
 function App() {
@@ -37,7 +37,7 @@ function App() {
   return (
     <div className="App">
       {clientSecret && (
-        <Elements options={options} stripe={stripePromise}>
+        <Elements stripe={stripePromise}>
           <CheckoutForm />
         </Elements>
       )}
